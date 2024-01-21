@@ -29,6 +29,11 @@ print(appointment_queues)
 @app.route('/')
 def home():
     return render_template('index.html')
+
+@app.route('/api/get_bays_interval_list', methods=['GET'])
+def get_queues():
+    return jsonify(main())
+
 @app.route('/api/get_queues', methods=['GET'])
 def get_queues():
     return jsonify(appointment_queues)

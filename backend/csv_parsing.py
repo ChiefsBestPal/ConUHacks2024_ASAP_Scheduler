@@ -253,6 +253,7 @@ def bay_matrix_to_list_of_intervals(bay_matrix : list[np.ndarray]) -> list[tuple
     return res #yield from
 
 def main():
+    RES = dict()
     hourtime_to_matrixminutes = lambda hourtime: int(
         (datetime.strptime(hourtime, "%H:%M") - datetime.strptime('07:00', "%H:%M")).total_seconds() // 60)
     grouped_entries = parse_to_sorted_day_dict()
@@ -347,7 +348,8 @@ def main():
         # print()
         # input()
         # exit()
-        return bay_matrix_to_list_of_intervals(zero_filled_array)
+        RES[day] = bay_matrix_to_list_of_intervals(zero_filled_array)
+    return RES
 if __name__ == '__main__':
     main()
     #print_2d_array(zero_filled_array)
