@@ -252,7 +252,7 @@ def bay_matrix_to_list_of_intervals(bay_matrix : list[np.ndarray]) -> list[tuple
         res.append(interval_js_body)
     return res #yield from
 
-if __name__ == '__main__':
+def main():
     hourtime_to_matrixminutes = lambda hourtime: int(
         (datetime.strptime(hourtime, "%H:%M") - datetime.strptime('07:00', "%H:%M")).total_seconds() // 60)
     grouped_entries = parse_to_sorted_day_dict()
@@ -339,14 +339,17 @@ if __name__ == '__main__':
                 SERVICED_TRACKER_DDICT[timestamp_booking['day']] \
                     [timestamp_booking['vehicle_category']] += 1
 
-        print(day)
-        print(SERVICED_TRACKER_DDICT[day])
-        print_2d_array(zero_filled_array)
-        print()
-        print(*bay_matrix_to_list_of_intervals(zero_filled_array),sep="\n")
-        print()
-        input()
+        # print(day)
+        # print(SERVICED_TRACKER_DDICT[day])
+        # print_2d_array(zero_filled_array)
+        # print()
+        # print(*bay_matrix_to_list_of_intervals(zero_filled_array),sep="\n")
+        # print()
+        # input()
         # exit()
+        return bay_matrix_to_list_of_intervals(zero_filled_array)
+if __name__ == '__main__':
+    main()
     #print_2d_array(zero_filled_array)
     # printable_matrix = list(map(lambda row: ''.join(map(str,row)),zero_filled_array))
     # print(*printable_matrix,sep="\n\n\r")

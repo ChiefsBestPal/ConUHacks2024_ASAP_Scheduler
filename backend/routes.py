@@ -8,6 +8,8 @@ import os
 #from flask_cors import CORS, cross_origin
 #from flask_session import Session
 
+from csv_parsing import *
+
 WDIR = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(WDIR + os.sep + '.flaskenv')
 print(__name__)
@@ -20,9 +22,8 @@ app = Flask(__name__)
 # Session(app)
 #
 # cors = CORS(
-#TODO make this into well-formed efficiently designed data structure
-appointment_queues = \
-    dict(zip(range(0,10),([] for _ in range(0,10))))
+
+appointment_queues = main()
 print(appointment_queues)
 
 @app.route('/')
