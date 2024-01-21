@@ -6,6 +6,12 @@ import itertools as it
 import operator as op
 from bay_intervals_ds import maximize_non_overlapping
 import numpy as np
+from collections import Counter,defaultdict
+
+SERVICED_VEHICULE_CATEGORIES_COUNTERFUNC = lambda *args,**kwargs: \
+                        Counter(**dict.fromkeys(list(VehiculeCategory.__members__),0))
+SERVICED_TRACKER_DDICT = defaultdict(SERVICED_VEHICULE_CATEGORIES_COUNTERFUNC)
+
 
 WDIR = os.path.abspath(os.path.dirname(__file__))
 CSV_DB_PATH = WDIR + os.sep + 'datafile.csv'
@@ -89,6 +95,9 @@ def initial_half_avg_optimal_bayconfig(bay_matrix : list[np.ndarray], day_bookin
         for ix,bay_normal_interval in enumerate(bay_normal_intervals):
             if bay_normal_interval not in maximal_nonoverlaps_bayconfig:
                 remaining_daybookings_for_freebays.append(bay_normal_bookings[ix])
+            else:
+                SERVICED_TRACKER_DDICT[bay_normal_bookings[ix]['day']]\
+                                        [bay_normal_bookings[ix]['vehicle_category']] += 1
         remaining_bookings_for_freebays.extend(remaining_daybookings_for_freebays)
 
         for (start_minuteix,end_minuteix) in maximal_nonoverlaps_bayconfig:
@@ -121,6 +130,7 @@ def final_half_greedy_bayconfig(bay_matrix,remaining_bookings_for_freebays):
             "vehicle_category"] is VehiculeCategory.FULLSIZE_CAR:
             if int(start_minute) >= 690:
                 continue
+
         type_veh = get_vehicule_ordinal_from_booking(timestamp_booking)
         flag = 0
         for freeBayNUmber in range(5, 10):
@@ -134,6 +144,10 @@ def final_half_greedy_bayconfig(bay_matrix,remaining_bookings_for_freebays):
                         break
                     zero_filled_array[freeBayNUmber][index] = zero_filled_array[freeBayNUmber][index] + type_veh
                     flag = 1
+
+        if flag != 0:
+            SERVICED_TRACKER_DDICT[timestamp_booking['day']] \
+                [timestamp_booking['vehicle_category']] += 1
     #print_2d_array(zero_filled_array)
     return zero_filled_array
 def calculate_duration_in_minutes(start_datetime_str, end_datetime_str):
@@ -166,6 +180,10 @@ def print_2d_array(arr):
 
 if __name__ == '__main__':
     grouped_entries = parse_to_sorted_day_dict()
+
+    for day in grouped_entries.keys():
+        SERVICED_TRACKER_DDICT[day]
+
     rows = 10
     columns = 720
     zero_filled_array = [np.array(columns*[0]) for _ in range(rows)]
@@ -174,12 +192,14 @@ if __name__ == '__main__':
     #     *initial_half_avg_optimal_bayconfig(zero_filled_array,
     #
     #                                         list(grouped_entries.values())[2]))
+
+
     print("DONE SETTING UP THE OPTIMAL INITIAL STATE")
     for day,day_bookings in grouped_entries.items():
         zero_filled_array = final_half_greedy_bayconfig(
             *initial_half_avg_optimal_bayconfig(zero_filled_array,
-
                                                 day_bookings))
+
         for timestamp_booking in filter(lambda b: b['isWalkIn'] or b['isSameDayBooking'], day_bookings):
             start = timestamp_booking["start_datetime"]
             end = timestamp_booking["end_datetime"]
@@ -212,6 +232,10 @@ if __name__ == '__main__':
                         zero_filled_array[reservedBayNumber][index] = zero_filled_array[reservedBayNumber][
                                                                           index] + type_veh
                         flag = 1
+            if flag != 0:
+                SERVICED_TRACKER_DDICT[timestamp_booking['day']] \
+                    [timestamp_booking['vehicle_category']] += 1
+                continue
             for freeBayNUmber in range(5,10):
                 if flag == 0:
                     initial_state = [row[:] for row in zero_filled_array]
@@ -223,7 +247,12 @@ if __name__ == '__main__':
                             break
                         zero_filled_array[freeBayNUmber][index] = zero_filled_array[freeBayNUmber][index] + type_veh
                         flag = 1
+            if flag != 0:
+                SERVICED_TRACKER_DDICT[timestamp_booking['day']] \
+                    [timestamp_booking['vehicle_category']] += 1
+
         print(day)
+        print(SERVICED_TRACKER_DDICT[day])
         print_2d_array(zero_filled_array)
         print()
         input()
