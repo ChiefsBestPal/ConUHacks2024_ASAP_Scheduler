@@ -26,6 +26,7 @@ def epoch_to_day_date(epoch_time: int)->str:
     formatted_date = datetime_object.strftime("%Y-%m-%d")
     return str(formatted_date)
 
+
 def parse_to_sorted_day_dict():
     with open(CSV_DB_PATH,'r') as file:
         csv_reader = csv.reader(file)
@@ -39,17 +40,26 @@ def parse_to_sorted_day_dict():
         grouped_entries = {date: list(group) for date, group in it.groupby(data_list, key=lambda x: x["start_datetime"].split(' ')[0])}
         for day, bookings_lst in grouped_entries.copy().items():
             for ix,b in enumerate(bookings_lst):
-                grouped_entries[day][ix]['vehicle_category'] = category =  csv_vehicule_to_enumvehicule(grouped_entries[day][ix]['vehicle_category'])
+                grouped_entries[day][ix]['vehicle_category'] = category = csv_vehicule_to_enumvehicule(grouped_entries[day][ix]['vehicle_category'])
                 del grouped_entries[day][ix]['vehicle_category']
                 # endtime_epoch = csv_date_to_epoch(b['start_datetime']) #+ category.hours * 3600
                 endtime_obj = datetime.strptime(b['start_datetime'], r"%Y-%m-%d %H:%M") + timedelta(hours=category.hours)
                 grouped_entries[day][ix]['end_datetime'] = endtime_obj.strftime("%H:%M")
 
+                grouped_entries[day][ix]['day'] = day
+                grouped_entries[day][ix]['isWalkIn'] = is_walk_in = b['start_datetime'] == b['requestcall_datetime']
+                grouped_entries[day][ix]['isSameDayBooking'] = not is_walk_in and request_day == day
+
                 grouped_entries[day][ix]['start_datetime'] = b['start_datetime'].split(' ')[1]
+
+
+                grouped_entries[day][ix]['vehicle_category'] = category
+                request_day = b['requestcall_datetime'].split(' ')[0]#datetime.strptime(b['requestcall_datetime'].split(' ')[0], r"%Y-%m-%d")
+
+
 
                 del grouped_entries[day][ix]['requestcall_datetime']
 
-                grouped_entries[day][ix]['vehicle_category'] = category
             grouped_entries[day].sort(key=op.itemgetter('start_datetime'))
         return grouped_entries
 
