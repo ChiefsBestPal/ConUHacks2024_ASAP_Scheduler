@@ -65,6 +65,105 @@ def parse_to_sorted_day_dict():
             grouped_entries[day].sort(key=op.itemgetter('start_datetime'))
         return grouped_entries
 
+
+def initial_half_avg_optimal_bayconfig(bay_matrix : list[np.ndarray], day_bookings: list[dict]) -> tuple[list[np.ndarray],list]:
+    hourtime_to_matrixminutes = lambda hourtime: int((datetime.strptime(hourtime, "%H:%M") - datetime.strptime('07:00', "%H:%M")).total_seconds() // 60)
+
+    remaining_bookings_for_freebays = []
+
+    normal_bookings = list(it.filterfalse(lambda b: b['isWalkIn'] or b['isSameDayBooking'], day_bookings))
+
+    
+    for reservedBayNumber in range(0, 5):
+        vehicule_enum_ordinal = reservedBayNumber + 1
+        bay_normal_bookings = list(filter(lambda b:get_vehicule_ordinal_from_booking(b) == vehicule_enum_ordinal,
+                                     normal_bookings))
+
+        bay_normal_intervals = list(map(lambda tup: tuple(map(hourtime_to_matrixminutes,tup)),
+                                        map(op.itemgetter('start_datetime','end_datetime'),bay_normal_bookings)
+                                        ))
+
+        maximal_nonoverlaps_bayconfig = maximize_non_overlapping(bay_normal_intervals)
+
+        remaining_daybookings_for_freebays = []
+        for ix,bay_normal_interval in enumerate(bay_normal_intervals):
+            if bay_normal_interval not in maximal_nonoverlaps_bayconfig:
+                remaining_daybookings_for_freebays.append(bay_normal_bookings[ix])
+        remaining_bookings_for_freebays.extend(remaining_daybookings_for_freebays)
+
+        for (start_minuteix,end_minuteix) in maximal_nonoverlaps_bayconfig:
+            bay_matrix[reservedBayNumber][start_minuteix : end_minuteix + 1] = vehicule_enum_ordinal
+
+    return bay_matrix,remaining_bookings_for_freebays
+
+
+def final_half_greedy_bayconfig(bay_matrix,remaining_bookings_for_freebays):
+
+
+    zero_filled_array = bay_matrix#[np.array(columns*[0]) for _ in range(rows)]
+
+    #for day_bookings in remaining_bookings_for_freebays:#grouped_entries.items():
+    for timestamp_booking in remaining_bookings_for_freebays: #list(it.filterfalse(lambda b: b['isWalkIn'] or b['isSameDayBooking'], day_bookings)):
+        start = timestamp_booking["start_datetime"]
+        end = timestamp_booking["end_datetime"]
+        duration = calculate_duration_in_minutes(start, end)
+
+        start_minute = calculate_duration_in_minutes('07:00', start)
+
+        if timestamp_booking["vehicle_category"] is VehiculeCategory.CLASS2_TRUCK:
+            if int(start_minute) >= 600:
+                continue
+        if timestamp_booking["vehicle_category"] is VehiculeCategory.CLASS1_TRUCK:
+            if int(start_minute) >= 660:
+                continue
+        if timestamp_booking["vehicle_category"] is VehiculeCategory.COMPACT_CAR or timestamp_booking[
+            "vehicle_category"] is VehiculeCategory.MEDIUM_CAR or timestamp_booking[
+            "vehicle_category"] is VehiculeCategory.FULLSIZE_CAR:
+            if int(start_minute) >= 690:
+                continue
+        type_veh = get_vehicule_ordinal_from_booking(timestamp_booking)
+        flag = 0
+        for freeBayNUmber in range(5, 10):
+            if flag == 0:
+                initial_state = [row[:] for row in zero_filled_array]
+                for i in range(int(duration)):
+                    index = int(start_minute) + i
+                    if zero_filled_array[freeBayNUmber][index] != 0:
+                        zero_filled_array = initial_state
+                        flag = 0
+                        break
+                    zero_filled_array[freeBayNUmber][index] = zero_filled_array[freeBayNUmber][index] + type_veh
+                    flag = 1
+    #print_2d_array(zero_filled_array)
+    return zero_filled_array
+def calculate_duration_in_minutes(start_datetime_str, end_datetime_str):
+    # Assuming datetime strings are in the format '%H:%M'
+    format_str = '%H:%M'
+
+    # Convert datetime strings to datetime objects
+    start_datetime = datetime.strptime(start_datetime_str, format_str)
+    end_datetime = datetime.strptime(end_datetime_str, format_str)
+
+    # Calculate the difference
+    duration = end_datetime - start_datetime
+
+    # Get the total amount of minutes
+    total_minutes = duration.total_seconds() / 60
+
+    return total_minutes
+
+
+def get_vehicule_ordinal_from_booking(booking : dict) -> int:
+    vehicle_categoryenum: VehiculeCategory = booking['vehicle_category']
+    return list(vehicle_categoryenum.__class__.__members__.values()).index(vehicle_categoryenum) + 1
+
+
+def print_2d_array(arr):
+    for row in arr:
+        for element in row:
+            print(element, end=" ")
+        print()
+
 if __name__ == '__main__':
     grouped_entries = parse_to_sorted_day_dict()
     rows = 10

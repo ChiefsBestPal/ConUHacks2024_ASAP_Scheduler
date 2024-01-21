@@ -1,3 +1,5 @@
+import csv
+
 from flask import Flask, jsonify, request,render_template
 from collections import deque
 from dotenv import load_dotenv
@@ -44,6 +46,19 @@ def schedule_appointment():
     data = request.get_json()
     print(f"TODO: do add schedule appointment (request data: {data})")
     return jsonify(success=True, message='Appointment scheduled successfully.')
+
+@app.route('/api/get_appointments', methods=['GET'])
+def get_appointments():
+    csv_file_path = 'datafile.csv'
+
+    appointments_list = []
+    with open(csv_file_path, 'r') as file:
+        csv_reader = csv.reader(file)
+        for row in csv_reader:
+            row_string = ', '.join(row)
+            appointments_list.append(row_string)
+
+    return jsonify(appointments_list)
 
 
 if __name__ == '__main__':
