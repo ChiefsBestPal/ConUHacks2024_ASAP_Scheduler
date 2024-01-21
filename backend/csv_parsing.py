@@ -223,6 +223,35 @@ def print_2d_array(arr):
             print(element, end=" ")
         print()
 
+def bay_matrix_to_list_of_intervals(bay_matrix : list[np.ndarray]) -> list[tuple[str,str]]:
+    minutesIx_to_hourstime = lambda minutes_to_add: (datetime.strptime('07:00', "%H:%M") + timedelta(minutes=minutes_to_add)).strftime("%H:%M")
+    res = []
+    js_type_lookup = dict(zip(list(VehiculeCategory.__members__.values()),('C','M','F','C1','C2')))
+    for bayNum, row in enumerate(bay_matrix,start=1):
+        interval_js_body = dict()
+        interval_js_body['bay'] = f'Bay {bayNum}'
+        interval_js_body['reservations'] = []
+        skipNext = False
+        bayIntervals = []
+        for minuteIx,typeNum in enumerate(row):
+            if skipNext and int(typeNum) == 0:
+                skipNext = False
+                continue
+            elif skipNext:
+                continue
+
+            if int(typeNum) != 0:
+                vehicle_category_enum = list(VehiculeCategory.__members__.values())[int(typeNum)-1]
+                skipNext = True
+                bayIntervals.append((minuteIx , minuteIx + int(vehicle_category_enum.hours * 60)))
+                interval_js_body['reservations'].append({
+                    'start' : minutesIx_to_hourstime(minuteIx),
+                    'end' : minutesIx_to_hourstime(minuteIx + int(vehicle_category_enum.hours * 60)) ,
+                    'type' :  js_type_lookup[vehicle_category_enum]
+                })
+        res.append(interval_js_body)
+    return res #yield from
+
 if __name__ == '__main__':
     hourtime_to_matrixminutes = lambda hourtime: int(
         (datetime.strptime(hourtime, "%H:%M") - datetime.strptime('07:00', "%H:%M")).total_seconds() // 60)
@@ -313,6 +342,8 @@ if __name__ == '__main__':
         print(day)
         print(SERVICED_TRACKER_DDICT[day])
         print_2d_array(zero_filled_array)
+        print()
+        print(*bay_matrix_to_list_of_intervals(zero_filled_array),sep="\n")
         print()
         input()
         # exit()
