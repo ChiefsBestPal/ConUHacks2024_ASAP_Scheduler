@@ -4,7 +4,12 @@ import { addDays, format } from 'date-fns';
 
 const timelineHours = Array.from({ length: 12 }, (_, i) => `${7 + i}:00`);
 
-const bays = [
+
+
+
+
+
+let bays = [
     {
         bay: "Bay 1",
         reservations: [
@@ -95,6 +100,23 @@ const bays = [
     },
 ];
 
+function getAllData() {
+  fetch('http://localhost:5000/api/get_bays_interval_list', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    //body: JSON.stringify({ key: 'value' }) // Replace with your data object
+  }).then(
+    response => response.json()
+  ).then(
+    data => {
+      bays = data;
+    }
+  )
+}
+
+
 function calculateReservationPositionAndWidth(reservation, totalHours) {
   const timeToFraction = time => {
       const [hours, minutes] = time.split(':').map(Number);
@@ -145,6 +167,10 @@ export default function TabularData() {
     };
 
     const formattedDate = format(currentDate, 'yyyy-MM-dd');
+
+    useEffect(() => {
+      getAllData(); // Call the function when the component mounts and when currentDate changes
+    }, [currentDate]);
 
   return (
     <div className='tabularContainer'>
