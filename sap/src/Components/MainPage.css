@@ -1,0 +1,40 @@
+.RenderedData {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  background-color: #0B60B0;
+  color: white;
+  flex-direction: column;
+  height: 100%;
+  align-items: center;
+
+}
+
+.Header {
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 25px;
+  width: 100%;
+  background-color: #3652AD;
+  border: 2px solid white;
+}
+
+.Footer {
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 25px;
+  width: 100%;
+  background-color: #3652AD;
+  border: 2px solid white;
+}
+
+.mainContent{
+  width: 90%;
+  display: flex;
+  justify-content: center;
+  padding: 100px;
+}

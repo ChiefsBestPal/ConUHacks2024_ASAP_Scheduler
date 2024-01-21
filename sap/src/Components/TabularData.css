@@ -1,0 +1,129 @@
+* {
+  font-size: 20px;
+}
+
+.tabularContainer {
+  border: 1px solid white;
+  border-radius: 10px;
+}
+
+.dateNavigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+  border-radius: 10px 10px 0 0;
+  border: 2px solid white;
+}
+
+.dateNavigation button {
+  height: 30px;
+  background-color: #40A2D8;
+  color: white;
+  border: none;
+  padding: 10px 5px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  line-height: 20px;
+  width: 110px;
+  height: 40px;
+}
+
+
+.dateNavigation button:first-child {
+  border-radius: 10px 0 0 0;
+  border-right: 3px solid white;
+}
+
+
+.dateNavigation button:last-child {
+  border-radius: 0 10px 0 0;
+  border-left: 3px solid white;
+}
+.dateNavigation button:hover {
+  background-color: #6895D2;
+}
+
+.dateNavigation span {
+  width: 100%;
+  color: white;
+  background-color: #6895D2;
+  height: 100%;
+  box-sizing: border-box;
+  height: 40px;
+  vertical-align: middle;
+
+}
+
+
+.tableContainer {
+  background-color: #86B6F6;
+  color: #EEF5FF;
+  display: flex;
+  justify-items: center;
+  align-items: center;
+}
+
+.tableContainer {
+  overflow: hidden;
+  border-radius: 0 0 10px 10px;
+  margin: 0 auto;
+  width: auto; 
+}
+
+
+
+.tabularData {
+  width: auto;
+  margin: 0 auto;
+}
+
+
+.tabularData table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 0 0 10px 10px;
+  
+}
+
+.tabularData tbody {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 0 0 10px 10px;
+}
+
+.tabularData th, .tabularData td {
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  text-align: center;
+  padding: 10px;
+  height: 40px;
+}
+
+/* Header style */
+.tabularData thead th {
+  position: sticky;
+}
+
+.tabularData {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabularData th, .tabularData td {
+  border: 2px solid #EEF5FF;
+  border-top: 0px solid white;
+  border-radius: 0 0 10px 10px;
+  text-align: center;
+  vertical-align: middle;
+  
+}
+
+div {
+  box-sizing: border-box;
+}
+
+
