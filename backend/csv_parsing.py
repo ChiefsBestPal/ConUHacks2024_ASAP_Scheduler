@@ -301,7 +301,7 @@ def main():
                     continue
             type_veh = get_vehicule_ordinal_from_booking(timestamp_booking)
             flag = 0
-            for reservedBayNumber in range(0,5):
+            for reservedBayNumber in range(0,5):#TODO FIX THIS
                 if type_veh != reservedBayNumber+1:
                     continue
                 if flag == 0:
@@ -340,13 +340,13 @@ def main():
                 SERVICED_TRACKER_DDICT[timestamp_booking['day']] \
                     [timestamp_booking['vehicle_category']] += 1
 
-        # print(day)
-        # print(SERVICED_TRACKER_DDICT[day])
-        # print_2d_array(zero_filled_array)
-        # print()
-        # print(*bay_matrix_to_list_of_intervals(zero_filled_array),sep="\n")
-        # print()
-        # input()
+        print(day)
+        print(SERVICED_TRACKER_DDICT[day])
+        print_2d_array(zero_filled_array)
+        print()
+        print(*bay_matrix_to_list_of_intervals(zero_filled_array),sep="\n")
+        print()
+        input()
         # exit()
         RES[day] = bay_matrix_to_list_of_intervals(zero_filled_array)
     return RES

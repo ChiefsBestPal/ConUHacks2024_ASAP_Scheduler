@@ -9,7 +9,7 @@ const timelineHours = Array.from({ length: 12 }, (_, i) => `${7 + i}:00`);
 
 
 
-let bays = [
+let bays_ = [
     {
         bay: "Bay 1",
         reservations: [
@@ -100,21 +100,7 @@ let bays = [
     },
 ];
 
-function getAllData() {
-  fetch('http://localhost:5000/api/get_bays_interval_list', {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    //body: JSON.stringify({ key: 'value' }) // Replace with your data object
-  }).then(
-    response => response.json()
-  ).then(
-    data => {
-      bays = data;
-    }
-  )
-}
+
 
 
 function calculateReservationPositionAndWidth(reservation, totalHours) {
@@ -134,8 +120,23 @@ function calculateReservationPositionAndWidth(reservation, totalHours) {
 }
 
 export default function TabularData() {
+    const [bays, setBays] = useState(bays_);
   const [width, setWidth] = useState(window.innerWidth);
-
+function getAllData() {
+  fetch('http://localhost:5000/api/get_bays_interval_list', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    //body: JSON.stringify({ key: 'value' }) // Replace with your data object
+  }).then(
+    response => response.json()
+  ).then(
+    data => {
+      setBays(data['2022-10-01']);
+    }
+  )
+}
   useEffect(() => {
       const handleResize = () => {
           setWidth(window.innerWidth);

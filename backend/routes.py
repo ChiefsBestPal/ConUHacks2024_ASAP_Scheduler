@@ -3,6 +3,7 @@ import csv
 from flask import Flask, jsonify, request,render_template
 from collections import deque
 from dotenv import load_dotenv
+from flask_cors import CORS,cross_origin
 import os
 #from requests import HTTPError
 #from flask_cors import CORS, cross_origin
@@ -14,6 +15,8 @@ WDIR = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(WDIR + os.sep + '.flaskenv')
 print(__name__)
 app = Flask(__name__)
+CORS(app)
+
 #from forms import authorized, login_required
 
 # with app.app_context():
@@ -30,12 +33,13 @@ print(appointment_queues)
 def home():
     return render_template('index.html')
 
-@app.route('/api/get_bays_interval_list', methods=['GET'])
+@app.route('/api/get_bays_interval_list', methods=['GET','OPTIONS'])
+@cross_origin()
 def get_queues():
     return jsonify(main())
 
 @app.route('/api/get_queues', methods=['GET'])
-def get_queues():
+def get_queues2():
     return jsonify(appointment_queues)
 
 @app.route('/api/update_queue/<bay>', methods=['POST'])
